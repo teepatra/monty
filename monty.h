@@ -1,14 +1,31 @@
-#ifndef _MONTY_H
-#define _MONTY_H
+#ifndef MONTY_H
+#define MONTY_H
+#define _GNU_SOURCE
 
-/* Libraries */
-#include <ctype.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <sys/types.h>
 #include <unistd.h>
+#include <fcntl.h>
 
-#define MAX_LINE_SIZE 1024
+/**
+ * struct global_s - variables -> args, file, line content
+ * @arg: value
+ * @line: input line content
+ * @file: pointer to monty file
+ *
+ * Description: variables that carries values through the program
+ */
+typedef struct global_s
+{
+	char *arg;
+	FILE *file;
+	char *line;
+} glob_t;
+
+extern glob_t glob;
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -19,7 +36,6 @@
  * Description: doubly linked list node structure
  * for stack, queues, LIFO, FIFO
  */
-
 typedef struct stack_s
 {
 	int n;
@@ -35,52 +51,35 @@ typedef struct stack_s
  * Description: opcode and its function
  * for stack, queues, LIFO, FIFO
  */
-
 typedef struct instruction_s
 {
 	char *opcode;
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/**
- * struct instance_s - data instance
- * @line: the readed line
- * @args: the arguments
- * @line_number: line number
- * @fp: the file
- * @filename: filename
- * Description: data instance, line, args
- */
+/* Function prototypes */
+void process_line(stack_t **stack);
+void exec_opcode(char *opcode, stack_t **stack, unsigned int line_number);
 
-typedef struct instance_s
-{
-	char *line;
-	char **args;
-	char *filename;
-	int line_number;
-	FILE *fp;
-} data_t;
+/* Stack helper functions */
+stack_t *add_nodeint(stack_t **stack, const int n);
+int is_integer(char *str);
+void free_list(stack_t *stack);
 
-extern data_t data;
-
-/* Prototypes */
-
-int process_line(stack_t **stack);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-void add_dnodeint(stack_t **stack, unsigned int line_number);
-void push_error(short int err_code);
-void free_data(void);
-void print_dlistint(stack_t **stack, unsigned int line_number);
-void free_dlistint(stack_t *stack);
-int split_line(void);
-void print_top(stack_t **stack, unsigned int line_number);
-void pop_top(stack_t **stack, unsigned int line_number);
+void op_nothing(stack_t **stack, unsigned int line_number);
+void _sub(stack_t **stack, unsigned int line_number);
+void _div(stack_t **stack, unsigned int line_number);
+void _mul(stack_t **stack, unsigned int line_number);
+void _mod(stack_t **stack, unsigned int line_number);
+void print_char(stack_t **stack, unsigned int line_number);
+void print_str(stack_t **stack, unsigned int line_number);
+void push_opcode(stack_t **stack, unsigned int line_number);
+void op_pall(stack_t **stack, unsigned int line_number);
+void print_int(stack_t **stack, unsigned int line_number);
+void pop_opcode(stack_t **stack, unsigned int line_number);
 void swap_top(stack_t **stack, unsigned int line_number);
-int _isdigit(char *str);
-void none(stack_t **stack, unsigned int line_number);
-void add_top_two(stack_t **stack, unsigned int line_number);
-void sub_top_two(stack_t **stack, unsigned int line_number);
-void div_top_two(stack_t **stack, unsigned int line_number);
-void mul_top_two(stack_t **stack, unsigned int line_number);
-void mod_top_two(stack_t **stack, unsigned int line_number);
-#endif /* _MONTY_H */
+void add(stack_t **stack, unsigned int line_number);
+
+
+
+#endif /* monty.h */

@@ -1,43 +1,34 @@
 #include "monty.h"
-#include <stdio.h>
-#include <stdlib.h>
+
+glob_t glob;
 
 /**
- * Globale data - collection of data instance
- */
-data_t data;
-
-/**
- * main - main function
- * @ac: arguments count
- * @av: arguments vector
+ * main - Main function for monty program.
+ * @argc: arguments count
+ * @argv: argument vector
  *
- * Return: (Success) EXIT_SUCCESS
- * ------- (Fail) EXIT_FAILURE
+ * Return: 0 on success, non-zero on failure
  */
-#define MAX_LINE_SIZE 1024
-
-int main(int ac, char **av)
+int main(int argc, char *argv[])
 {
-        FILE *fp;
-        char line[MAX_LINE_SIZE];
+	stack_t *stack = NULL;
 
-        if (ac != 2) {
-                fprintf(stderr, "Usage: %s filename\n", av[0]);
-                exit(EXIT_FAILURE);
-        }
+	if (argc != 2)
+	{
+		fprintf(stderr, "USAGE: monty file\n");
+		exit(EXIT_FAILURE);
+	}
 
-        fp = fopen(av[1], "r");
-        if (fp == NULL) {
-                fprintf(stderr, "Error: cannot open file %s\n", av[1]);
-                exit(EXIT_FAILURE);
-        }
+	glob.file = fopen(argv[1], "r");
+	if (glob.file == NULL)
+	{
+		fprintf(stderr, "Error: Unable to open file %s\n", argv[1]);
+		exit(EXIT_FAILURE);
+	}
 
-        while (fgets(line, MAX_LINE_SIZE, fp) != NULL) {
-                if (*line == '\n')
-                        continue;
-        }
-
-        fclose(fp);
-        return EXIT_SUCCESS;
+	process_line(&stack);
+	fclose(glob.file);
+	free(glob.line);
+	free_list(stack);
+	exit(EXIT_SUCCESS);
 }
